@@ -1,0 +1,102 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: Cluster
+metadata:
+  creationTimestamp: null
+  name: {{.domain_name}}
+spec:
+  api:
+    dns: {}
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: {{.state_store_bucket}}/{{.domain_name}}
+  etcdClusters:
+  - cpuRequest: 200m
+    etcdMembers:
+    - encryptedVolume: true
+      instanceGroup: control-plane-{{.aws_avalibility_region}}
+      name: a
+    manager:
+      backupRetentionDays: 90
+    memoryRequest: 100Mi
+    name: main
+  - cpuRequest: 100m
+    etcdMembers:
+    - encryptedVolume: true
+      instanceGroup: control-plane-{{.aws_avalibility_region}}
+      name: a
+    manager:
+      backupRetentionDays: 90
+    memoryRequest: 100Mi
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+    useServiceAccountExternalPermissions: true
+  kubeProxy:
+    enabled: false
+  kubelet:
+    anonymousAuth: false
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  - ::/0
+  kubernetesVersion: 1.28.6
+  masterPublicName: api.{{.domain_name}}
+  networkCIDR: 172.20.0.0/16
+  networking:
+    cilium:
+      enableNodePort: true
+  nonMasqueradeCIDR: 100.64.0.0/10
+  serviceAccountIssuerDiscovery:
+    discoveryStore: s3://{{.oidc_store_bucket}}/{{.domain_name}}/discovery/{{.domain_name}}
+    enableAWSOIDCProvider: true
+  sshAccess:
+  - 0.0.0.0/0
+  - ::/0
+  subnets:
+  - cidr: 172.20.0.0/16
+    name: {{.aws_avalibility_region}}
+    type: Public
+    zone: {{.aws_avalibility_region}}
+  topology:
+    dns:
+      type: Public
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{.domain_name}}
+  name: control-plane-{{.aws_avalibility_region}}
+spec:
+  image: {{.master_image}}
+  machineType: {{.master_machine_type}}
+  maxSize: 1
+  minSize: 1
+  role: Master
+  rootVolumeSize: {{.master_volume_size}}
+  subnets:
+  - {{.aws_avalibility_region}}
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{.domain_name}}
+  name: nodes-{{.aws_avalibility_region}}
+spec:
+  image: {{.node_image}}
+  machineType: {{.node_machine_type}}
+  maxSize: 1
+  minSize: 1
+  role: Node
+  rootVolumeSize: {{.node_volume_size}}
+  subnets:
+  - {{.aws_avalibility_region}}
