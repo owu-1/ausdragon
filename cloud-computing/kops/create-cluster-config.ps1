@@ -1,1 +1,0 @@
-kops create cluster --name=$domain_name --cloud=aws --zones=$aws_avalibility_region --discovery-store=s3://$oidc_store_bucket/$domain_name/discovery --control-plane-volume-size=$master_volume_size --node-volume-size=$node_volume_size --dry-run -o yaml | Out-File cluster.yml

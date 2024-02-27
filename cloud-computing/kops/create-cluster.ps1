@@ -1,2 +1,0 @@
-kops toolbox template --name $domain_name --template cluster.tmpl.yml --set-string "domain_name=$domain_name,state_store_bucket=$state_store_bucket,oidc_store_bucket=$oidc_store_bucket,aws_avalibility_region=$aws_avalibility_region,master_image=$master_image,master_machine_type=$master_machine_type,master_volume_size=$master_volume_size,node_image=$node_image,node_machine_type=$node_machine_type,node_volume_size=$node_volume_size" | Out-File cluster.yml
-kops create -f cluster.yml

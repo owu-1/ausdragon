@@ -10,7 +10,7 @@ spec:
     rbac: {}
   channel: stable
   cloudProvider: aws
-  configBase: {{.state_store_bucket}}/{{.domain_name}}
+  configBase: s3://{{.state_store_bucket}}/{{.domain_name}}
   etcdClusters:
   - cpuRequest: 200m
     etcdMembers:
@@ -77,6 +77,12 @@ spec:
   machineType: {{.master_machine_type}}
   maxSize: 1
   minSize: 1
+  mixedInstancesPolicy:
+    instances:
+      - {{.master_machine_type}}
+    onDemandAboveBase: 0
+    onDemandBase: 0
+    spotAllocationStrategy: capacity-optimized
   role: Master
   rootVolumeSize: {{.master_volume_size}}
   subnets:
@@ -96,6 +102,12 @@ spec:
   machineType: {{.node_machine_type}}
   maxSize: 1
   minSize: 1
+  mixedInstancesPolicy:
+    instances:
+      - {{.node_machine_type}}
+    onDemandAboveBase: 0
+    onDemandBase: 0
+    spotAllocationStrategy: lowest-price
   role: Node
   rootVolumeSize: {{.node_volume_size}}
   subnets:
