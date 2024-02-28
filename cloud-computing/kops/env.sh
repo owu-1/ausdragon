@@ -18,3 +18,7 @@ export master_volume_size="$master_volume_size"
 export node_image="$node_image"
 export node_machine_type="$node_machine_type"
 export node_volume_size="$node_volume_size"
+
+export gpu_node_image="$gpu_node_image"
+export gpu_node_machine_type="$gpu_node_machine_type"
+export gpu_node_volume_size="$gpu_node_volume_size"

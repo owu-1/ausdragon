@@ -11,6 +11,9 @@ spec:
   channel: stable
   cloudProvider: aws
   configBase: s3://{{.state_store_bucket}}/{{.domain_name}}
+  containerd:
+    nvidiaGPU:
+      enabled: true
   etcdClusters:
   - cpuRequest: 200m
     etcdMembers:
@@ -77,6 +80,8 @@ spec:
   machineType: {{.master_machine_type}}
   maxSize: 1
   minSize: 1
+  # Comment line below if you don't have a T type instance
+  cpuCredits: standard
   mixedInstancesPolicy:
     instances:
       - {{.master_machine_type}}
@@ -85,6 +90,7 @@ spec:
     spotAllocationStrategy: capacity-optimized
   role: Master
   rootVolumeSize: {{.master_volume_size}}
+  rootVolumeType: gp3
   subnets:
   - {{.aws_avalibility_region}}
 
@@ -102,6 +108,8 @@ spec:
   machineType: {{.node_machine_type}}
   maxSize: 1
   minSize: 1
+  # Comment line below if you don't have a T type instance
+  cpuCredits: standard
   mixedInstancesPolicy:
     instances:
       - {{.node_machine_type}}
@@ -110,5 +118,32 @@ spec:
     spotAllocationStrategy: lowest-price
   role: Node
   rootVolumeSize: {{.node_volume_size}}
+  rootVolumeType: gp3
+  subnets:
+  - {{.aws_avalibility_region}}
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{.domain_name}}
+  name: gpu-nodes-{{.aws_avalibility_region}}
+spec:
+  image: {{.gpu_node_image}}
+  machineType: {{.gpu_node_machine_type}}
+  maxSize: 1
+  minSize: 0
+  mixedInstancesPolicy:
+    instances:
+      - {{.gpu_node_machine_type}}
+    onDemandAboveBase: 0
+    onDemandBase: 0
+    spotAllocationStrategy: lowest-price
+  role: Node
+  rootVolumeSize: {{.gpu_node_volume_size}}
+  rootVolumeType: gp3
   subnets:
   - {{.aws_avalibility_region}}

@@ -18,7 +18,6 @@ domain_name=insert-domain-name
 
 # Master machine settings
 master_image=insert-master-image
-# note: arm64 on master doesn't work
 master_machine_type=insert-master-machine-type
 master_volume_size=insert-control-plane-volume-size
 
@@ -26,3 +25,8 @@ master_volume_size=insert-control-plane-volume-size
 node_image=insert-node-image
 node_machine_type=insert-node-machine-type
 node_volume_size=insert-node-volume-size
+
+# GPU node machine settings
+gpu_node_image=insert-gpu-node-image
+gpu_node_machine_type=insert-gpu-node-machine-type
+gpu_node_volume_size=insert-gpu-node-volume-size

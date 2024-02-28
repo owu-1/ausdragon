@@ -1,8 +1,8 @@
 Attempt to make the cheapest Kubernetes cluster with GPU nodes on AWS. Kubernetes is self-managed and everything is running on spot EC2 instances.
 
-The instruction below assume you have AWS CLI with a profile setup, terraform, and kops installed.
+The instructions below assume you have AWS CLI with a profile setup, terraform, kops, and kustomize installed.
 
-Create a new file in cloud-computing/variables.sh based on cloud-computing/variables.example.sh. You can ignore kops_aws_profile for now since the IAM user will be created with terraform first.
+Create a new file in cloud-computing/variables.sh based on cloud-computing/variables.example.sh. You can ignore kops_aws_profile for now since the IAM user will be created with terraform first. The control plane nodes work on t4g.small, not t3.micro. The ordinary nodes work on t3.micro.
 
 Ensure that the terraform_state_bucket exists in the specified AWS region.
 

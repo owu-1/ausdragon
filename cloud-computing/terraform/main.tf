@@ -18,7 +18,3 @@ provider "aws" {
 resource "aws_route53_zone" "kube" {
   name = var.domain_name
 }
-
-resource "aws_ecr_repository" "main" {
-  name = "main"
-}
