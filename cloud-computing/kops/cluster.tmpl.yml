@@ -9,13 +9,15 @@ spec:
   authorization:
     rbac: {}
   channel: stable
+  cloudControllerManager:
+    cpuRequest: 175m  # default: 200m
   cloudProvider: aws
   configBase: s3://{{.state_store_bucket}}/{{.domain_name}}
   containerd:
     nvidiaGPU:
       enabled: true
   etcdClusters:
-  - cpuRequest: 200m
+  - cpuRequest: 150m  # default: 200m
     etcdMembers:
     - encryptedVolume: true
       instanceGroup: control-plane-{{.aws_avalibility_region}}

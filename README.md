@@ -2,7 +2,7 @@ Attempt to make the cheapest Kubernetes cluster with GPU nodes on AWS. Kubernete
 
 The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/), [Kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/binaries/).
 
-Create a new file in cloud-computing/variables.sh based on cloud-computing/variables.example.sh. You can ignore kops_aws_profile for now since the IAM user will be created with terraform first. The control plane nodes work on t4g.small (unstable), not t3.micro. The ordinary nodes work on t3.micro.
+Create a new file in cloud-computing/variables.sh based on cloud-computing/variables.example.sh. You can ignore kops_aws_profile for now since the IAM user will be created with terraform first. Control plane nodes can work on 1 vCPU.
 
 Ensure that the terraform_state_bucket exists in the specified AWS region.
 
@@ -43,7 +43,7 @@ domain_name=example.com
 
 # Control plane machine settings
 control_plane_image=099720109477/ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-20240228
-control_plane_machine_type=t4g.small
+control_plane_machine_type=m7g.medium
 control_plane_volume_size=20
 
 # CPU node machine settings
