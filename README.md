@@ -49,8 +49,8 @@ control_plane_machine_type=m7g.medium
 control_plane_volume_size=20
 
 # CPU node machine settings
-cpu_node_image=099720109477/ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20240228
-cpu_node_machine_type=t3.micro
+cpu_node_image=099720109477/ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-20240228
+cpu_node_machine_type=r7g.medium
 cpu_node_volume_size=20
 
 # GPU node machine settings
