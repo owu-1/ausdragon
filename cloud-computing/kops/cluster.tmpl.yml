@@ -43,6 +43,7 @@ spec:
     enabled: false
   kubelet:
     anonymousAuth: false
+    cpuCFSQuota: false
   kubernetesApiAccess:
   - 0.0.0.0/0
   - ::/0

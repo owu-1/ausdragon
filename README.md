@@ -1,6 +1,6 @@
 Attempt to make the cheapest Kubernetes cluster with GPU nodes on AWS. Kubernetes is self-managed and everything is running on spot EC2 instances.
 
-The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/), [Kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/binaries/).
+The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/).
 
 Create a new file in cloud-computing/variables.sh based on cloud-computing/variables.example.sh. You can ignore kops_aws_profile for now since the IAM user will be created with terraform first. Control plane nodes can work on 1 vCPU.
 
@@ -19,6 +19,8 @@ Enter the kops environment by running "source cloud-computing/kops/env.sh".
 Create the cluster configuration by running cloud-computing/kops/create-cluster.sh.
 
 Deploy the cluster resources by running "kops update cluster --name $domain_name --yes --admin"
+
+Once the cluster is healthy, under cloud-computing/kserve run download_yamls.sh, then patch_yamls.sh, then install.sh to install Kserve.
 
 Example cloud-computing/variables.sh file
 

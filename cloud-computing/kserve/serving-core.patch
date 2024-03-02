@@ -1,0 +1,40 @@
+diff --git a/serving-core.yaml b/serving-core-edit.yaml
+index 179ccd1..3628863 100644
+--- a/serving-core.yaml
++++ b/serving-core-edit.yaml
+@@ -6221,7 +6221,7 @@ spec:
+           # https://github.com/knative/serving/issues/1625#issuecomment-511930023
+           resources:
+             requests:
+-              cpu: 300m
++              cpu: 100m
+               memory: 60Mi
+             limits:
+               cpu: 1000m
+@@ -6384,7 +6384,7 @@ spec:
+           image: gcr.io/knative-releases/knative.dev/serving/cmd/autoscaler@sha256:34796e9f760bb67065c6f101296513b38d04d39d11888e919692ac46fa6dc7c2
+           resources:
+             requests:
+-              cpu: 100m
++              cpu: 75m
+               memory: 100Mi
+             limits:
+               cpu: 1000m
+@@ -6518,7 +6518,7 @@ spec:
+           image: gcr.io/knative-releases/knative.dev/serving/cmd/controller@sha256:53d9aa4d2c7a82f5a01202e386f7503b21839cbe2e5e62f1e9bda2aa5f11b518
+           resources:
+             requests:
+-              cpu: 100m
++              cpu: 75m
+               memory: 100Mi
+             limits:
+               cpu: 1000m
+@@ -6704,7 +6704,7 @@ spec:
+           image: gcr.io/knative-releases/knative.dev/serving/cmd/webhook@sha256:700c69915dc7cd86dffb61c26b0ba34427fab809de1e3344589dd955b6440882
+           resources:
+             requests:
+-              cpu: 100m
++              cpu: 75m
+               memory: 100Mi
+             limits:
+               cpu: 500m
