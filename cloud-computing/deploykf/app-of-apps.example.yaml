@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: deploykf-app-of-apps
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: deploykf-app-of-apps
+    app.kubernetes.io/part-of: deploykf
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/deployKF/deployKF.git
+    targetRevision: v0.1.4 # <-- replace with a deployKF repo tag!
+    path: '.'
+
+    ## plugin configuration
+    ##
+    plugin:
+      name: deploykf
+      parameters:
+
+        ## the deployKF generator version
+        ##  - available versions: https://github.com/deployKF/deployKF/releases
+        ##
+        - name: source_version
+          string: '0.1.4' # <-- replace with a deployKF generator version!
+
+        ## paths to values files within the `repoURL` repository
+        ##  - the values in these files are merged, with later files taking precedence
+        ##  - we strongly recommend using 'sample-values.yaml' as the base of your values
+        ##    so you can easily upgrade to newer versions of deployKF
+        ##
+        - name: values_files
+          array:
+            - ./sample-values.yaml
+
+        ## a string containing the contents of a values file
+        ##  - this parameter allows defining values without needing to create a file in the repo
+        ##  - these values are merged with higher precedence than those defined in `values_files`
+        ##
+        - name: values
+          string: insert-values-here
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd

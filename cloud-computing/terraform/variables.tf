@@ -22,3 +22,9 @@ variable "domain_name" {
   type = string
   description = "The domain name to use for the cluster"
 }
+
+# deployKF
+variable "kubeflow_pipelines_bucket" {
+  type = string
+  description = "The name of the kubeflow pipelines bucket"
+}

@@ -1,0 +1,172 @@
+##
+## This demonstrates how you might structure overrides for the 'sample-values.yaml' file.
+## For a more comprehensive example, see the 'sample-values-overrides.yaml' in the main repo.
+##
+## Notes:
+##  - YAML maps are RECURSIVELY merged across values files
+##  - YAML lists are REPLACED in their entirety across values files
+##  - Do NOT include empty/null sections, as this will remove ALL values from that section.
+##    To include a section without overriding any values, set it to an empty map: `{}`
+##
+
+## --------------------------------------------------------------------------------
+##                              deploykf-dependencies
+## --------------------------------------------------------------------------------
+deploykf_dependencies:
+
+  ## --------------------------------------
+  ##             cert-manager
+  ## --------------------------------------
+  cert_manager:
+    {} # <-- REMOVE THIS, IF YOU INCLUDE VALUES UNDER THIS SECTION!
+
+  ## --------------------------------------
+  ##                 istio
+  ## --------------------------------------
+  istio:
+    valuesOverrides: |
+      istio-daemon:
+        pilot:
+          resources:
+            requests:
+              cpu: 100m # default 500m
+              memory: 512Mi # default 2048Mi
+
+  ## --------------------------------------
+  ##                kyverno
+  ## --------------------------------------
+  kyverno:
+    admissionController:
+      replicas: 1 # default 3
+      resources:
+        requests:
+          cpu: 100m # default 100
+    backgroundController:
+      resources:
+        requests:
+          cpu: 100m # default 100
+    cleanupController:
+      resources:
+        requests:
+          cpu: 100m # default 100
+    reportsController:
+      resources:
+        requests:
+          cpu: 100m # default 100
+
+## --------------------------------------------------------------------------------
+##                                  deploykf-core
+## --------------------------------------------------------------------------------
+deploykf_core:
+
+  ## --------------------------------------
+  ##             deploykf-auth
+  ## --------------------------------------
+  deploykf_auth:
+    {} # <-- REMOVE THIS, IF YOU INCLUDE VALUES UNDER THIS SECTION!
+
+  ## --------------------------------------
+  ##        deploykf-istio-gateway
+  ## --------------------------------------
+  deploykf_istio_gateway:
+    gateway:
+      hostname: insert-deploykf-subdomain-here
+      ## when using an ingress, standard ports are required
+      ## (the default in 'sample-values.yaml' are 8080/8443)
+      ports:
+        http: insert-http-port-here
+        https: insert-https-port-here
+    gatewayService:
+      type: ClusterIP
+    extraManifests: insert-nginx-ingress-yaml
+
+  ## --------------------------------------
+  ##      deploykf-profiles-generator
+  ## --------------------------------------
+  deploykf_profiles_generator:
+    profileDefaults:
+      tools:
+        kubeflowPipelines:
+          objectStoreAuth:
+            existingSecret: bucket-creds-backend # todo: don't use backend creds for users
+            existingSecretNamespace: kubeflow
+            existingSecretAccessKeyKey: AWS_ACCESS_KEY_ID
+            existingSecretSecretKeyKey: AWS_SECRET_ACCESS_KEY
+    users:
+      - id: user-1
+        email: "user1@example.com"
+      - id: user-2
+        email: "user2@example.com"
+    groups:
+      - id: team-1
+        users:
+          - user-1
+          - user-2
+    profiles:
+      - name: team-1
+        members:
+          - group: team-1
+            access:
+              role: edit
+              notebooksAccess: true
+
+## --------------------------------------------------------------------------------
+##                                   deploykf-opt
+## --------------------------------------------------------------------------------
+deploykf_opt:
+
+  ## --------------------------------------
+  ##            deploykf-minio
+  ## --------------------------------------
+  deploykf_minio:
+    enabled: false
+
+  ## --------------------------------------
+  ##            deploykf-mysql
+  ## --------------------------------------
+  deploykf_mysql:
+    {} # <-- REMOVE THIS, IF YOU INCLUDE VALUES UNDER THIS SECTION!
+
+## --------------------------------------------------------------------------------
+##                                  kubeflow-tools
+## --------------------------------------------------------------------------------
+kubeflow_tools:
+
+  ## --------------------------------------
+  ##                 katib
+  ## --------------------------------------
+  katib:
+    enabled: false
+
+  ## --------------------------------------
+  ##               notebooks
+  ## --------------------------------------
+  notebooks:
+    enabled: false
+
+  ## --------------------------------------
+  ##               pipelines
+  ## --------------------------------------
+  pipelines:
+    bucket:
+      name: insert-kubeflow-pipelines-bucket-name
+      region: insert-aws-region-name
+    objectStore:
+      useExternal: true
+      host: s3.amazonaws.com
+      port: ''
+      useSSL: true
+      auth:
+        existingSecret: bucket-creds-backend
+        existingSecretAccessKeyKey: AWS_ACCESS_KEY_ID
+        existingSecretSecretKeyKey: AWS_SECRET_ACCESS_KEY
+
+    # minioFix must be set to false when using external object store
+    kfpV2:
+      minioFix: false
+
+  tensorboards:
+    enabled: false
+
+  training_operator:
+    enabled: false

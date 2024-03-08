@@ -10,14 +10,14 @@ spec:
     rbac: {}
   channel: stable
   cloudControllerManager:
-    cpuRequest: 175m  # default: 200m
+    cpuRequest: 150m  # default: 200m
   cloudProvider: aws
   configBase: s3://{{.state_store_bucket}}/{{.domain_name}}
   containerd:
     nvidiaGPU:
       enabled: true
   etcdClusters:
-  - cpuRequest: 150m  # default: 200m
+  - cpuRequest: 125m  # default: 200m
     etcdMembers:
     - encryptedVolume: true
       instanceGroup: control-plane-{{.aws_avalibility_region}}
@@ -35,6 +35,8 @@ spec:
       backupRetentionDays: 90
     memoryRequest: 100Mi
     name: events
+  externalDns:
+    provider: external-dns
   iam:
     allowContainerRegistry: true
     legacy: false
@@ -120,7 +122,7 @@ spec:
       - {{.cpu_node_machine_type}}
     onDemandAboveBase: 0
     onDemandBase: 0
-    spotAllocationStrategy: lowest-price
+    spotAllocationStrategy: capacity-optimized
   role: Node
   rootVolumeSize: {{.cpu_node_volume_size}}
   rootVolumeType: gp3

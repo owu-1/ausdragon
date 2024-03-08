@@ -41,3 +41,12 @@ resource "aws_s3_bucket_acl" "oidc-store" {
   bucket = aws_s3_bucket.oidc-store.id
   acl = "public-read"
 }
+
+# deployKF
+resource "aws_s3_bucket" "kubeflow-pipelines" {
+  bucket = var.kubeflow_pipelines_bucket
+
+  tags = {
+    Name = "kubeflow-pipelines"
+  }
+}

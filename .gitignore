@@ -1,0 +1,18 @@
+cloud-computing/variables.sh
+
+cloud-computing/terraform/.terraform
+cloud-computing/kops/cluster.yml
+
+# Assumes that store store bucket name starts with "state-store-"
+cloud-computing/kops/state-store-*
+
+cloud-computing/kserve/yamls
+
+cloud-computing/deploykf/app-of-apps.yaml
+cloud-computing/deploykf/nginx-ingress.yaml
+cloud-computing/deploykf/nginx-ingress-controller.yaml
+cloud-computing/deploykf/values.yaml
+
+scripts/__pycache__
+scripts/accelerated_computing_instance_spot_data
+scripts/misc_instance_spot_data

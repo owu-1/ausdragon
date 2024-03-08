@@ -13,8 +13,19 @@ terraform_state_bucket=insert-terraform-state-bucket-name
 state_store_bucket=insert-state-store-bucket-name
 oidc_store_bucket=insert-oidc-store-bucket-name
 
+# S3 bucket for kubeflow
+kubeflow_pipelines_bucket=insert-kubeflow-pipelines-bucket-name
+
 # Domain name to be used for kubernetes cluster
 domain_name=insert-domain-name
+
+# Subdomain used for deployKF
+deploykf_subdomain_name=insert-subdomain
+
+# Ports used for deployKF
+# todo: explain nodeport range
+deploykf_http_port=insert-http-port-number # ingress does not expose this port
+deploykf_https_port=insert-https-port-number
 
 # Control plane machine settings
 control_plane_image=insert-control-plane-image

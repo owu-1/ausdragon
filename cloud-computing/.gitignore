@@ -1,9 +1,0 @@
-variables.sh
-
-terraform/.terraform
-kops/cluster.yml
-
-# Assumes that store store bucket name starts with "state-store-"
-kops/state-store-*
-
-kserve/yamls

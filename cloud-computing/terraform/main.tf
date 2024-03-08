@@ -18,3 +18,7 @@ provider "aws" {
 resource "aws_route53_zone" "kube" {
   name = var.domain_name
 }
+
+output "route53" {
+  value = aws_route53_zone.kube.name_servers
+}

@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: deploykf-gateway
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    ## nginx wil NOT proxy the SNI by default
+    ## see: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#backend-certificate-authentication
+    nginx.ingress.kubernetes.io/proxy-ssl-name: insert-deploykf-subdomain-here
+    nginx.ingress.kubernetes.io/proxy-ssl-server-name: 'on'
+    ## this config is needed due to a bug in ingress-nginx
+    ## see: https://github.com/kubernetes/ingress-nginx/issues/6728
+    nginx.ingress.kubernetes.io/proxy-ssl-secret: deploykf-istio-gateway/deploykf-istio-gateway-cert
+    # external-dns
+    external-dns.alpha.kubernetes.io/hostname: insert-dns-records-to-point-to-ingress
+spec:
+  ingressClassName: nginx
+  tls:
+    ## NOTE: this secret is created as part of the deployKF installation
+    - secretName: "deploykf-istio-gateway-cert"
+  rules:
+    - host: insert-deploykf-subdomain-here
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: "deploykf-gateway"
+                port:
+                  number: insert-https-port-here
+    - host: insert-deploykf-subdomain-with-glob-here
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: "deploykf-gateway"
+                port:
+                  number: insert-https-port-here
