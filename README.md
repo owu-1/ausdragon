@@ -1,3 +1,5 @@
+These docs are outdated. This project is experimental.
+
 Attempt to make the cheapest Kubernetes cluster with GPU nodes on AWS. Kubernetes is self-managed and everything is running on spot EC2 instances.
 
 The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/), [argocd](https://argo-cd.readthedocs.io/en/stable/cli_installation/) ([don't use 2.9.x](https://github.com/deployKF/deployKF/issues/70)), [yq](https://github.com/mikefarah/yq/?tab=readme-ov-file#install).
@@ -50,6 +52,18 @@ terraform_aws_profile=root
 kops_aws_profile=kops
 aws_region=ap-northeast-2
 aws_avalibility_region=ap-northeast-2a
+identity_provider_aws_region=ap-northeast-2
+
+# Domain names
+base_domain_name="example.com"
+cluster_domain_name="kubernetes.$base_domain_name"
+
+# Subdomain used for deployKF
+deploykf_domain_name="deploykf.$cluster_domain_name"
+
+# Admin email
+admin_email="admin@$base_domain_name"
+admin_email_routing_destination="user@example.net"
 
 # S3 bucket for terraform state
 terraform_state_bucket=terraform-state-abc123
@@ -61,13 +75,8 @@ oidc_store_bucket=oidc-store-abc123
 # S3 bucket for kubeflow
 kubeflow_pipelines_bucket=kubeflow-pipelines-abc123
 
-# Domain name to be used for kubernetes cluster
-domain_name=example.com
-
-# Subdomain used for deployKF
-deploykf_subdomain_name=deploykf.example.com
-
 # Ports used for deployKF
+# todo: explain nodeport range
 deploykf_http_port=30000 # ingress does not expose this port
 deploykf_https_port=30001
 
@@ -85,6 +94,26 @@ cpu_node_volume_size=30
 gpu_node_image=099720109477/ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-20240228
 gpu_node_machine_type=g5g.xlarge
 gpu_node_volume_size=20
+
+# Cloudflare
+# todo: might be giving unnecessary permissions. double check
+# Permissions
+# Account | Email Routing Addresses | Edit
+# Account | Email Routing Addresses | Read
+# Zone    | Email Routing Rules     | Edit
+# Zone    | Email Routing Rules     | Read
+# Zone    | Zone Settings           | Edit
+# Zone    | Zone Settings           | Read
+# Zone    | Zone                    | Edit
+# Zone    | Zone                    | Read
+# Zone    | DNS                     | Edit
+# Zone    | DNS                     | Read
+# Account Resources
+# Include | All accounts
+# Zone Resources
+# Include | All zones from an account | account-name
+cloudflare_account_id='abcdef123'
+cloudflare_api_token='abcdef123'
 ```
 
 You can edit ```cloud-computing/kops/cluster.tmpl.yml``` to adjust scaling min/max and change instances to on-demand for more stability. Also if you want T instances to run in standard mode, uncomment ```cpuCredits: standard``` for your instance group.

@@ -2,7 +2,7 @@ apiVersion: kops.k8s.io/v1alpha2
 kind: Cluster
 metadata:
   creationTimestamp: null
-  name: {{.domain_name}}
+  name: {{.cluster_domain_name}}
 spec:
   api:
     dns: {}
@@ -12,7 +12,7 @@ spec:
   cloudControllerManager:
     cpuRequest: 150m  # default: 200m
   cloudProvider: aws
-  configBase: s3://{{.state_store_bucket}}/{{.domain_name}}
+  configBase: s3://{{.state_store_bucket}}/{{.cluster_domain_name}}
   containerd:
     nvidiaGPU:
       enabled: true
@@ -41,6 +41,13 @@ spec:
     allowContainerRegistry: true
     legacy: false
     useServiceAccountExternalPermissions: true
+  kubeAPIServer:
+    oidcIssuerURL: {{.cognito_issuer_url}}
+    oidcClientID: {{.cognito_client_id}}
+    oidcUsernameClaim: email
+    oidcUsernamePrefix: 'oidc:'
+    oidcGroupsClaim: cognito:groups
+    oidcGroupsPrefix: 'oidc:'
   kubeProxy:
     enabled: false
   kubelet:
@@ -50,14 +57,14 @@ spec:
   - 0.0.0.0/0
   - ::/0
   kubernetesVersion: 1.28.6
-  masterPublicName: api.{{.domain_name}}
+  masterPublicName: api.{{.cluster_domain_name}}
   networkCIDR: 172.20.0.0/16
   networking:
     cilium:
       enableNodePort: true
   nonMasqueradeCIDR: 100.64.0.0/10
   serviceAccountIssuerDiscovery:
-    discoveryStore: s3://{{.oidc_store_bucket}}/{{.domain_name}}/discovery/{{.domain_name}}
+    discoveryStore: s3://{{.oidc_store_bucket}}/{{.cluster_domain_name}}/discovery/{{.cluster_domain_name}}
     enableAWSOIDCProvider: true
   sshAccess:
   - 0.0.0.0/0
@@ -78,7 +85,7 @@ kind: InstanceGroup
 metadata:
   creationTimestamp: null
   labels:
-    kops.k8s.io/cluster: {{.domain_name}}
+    kops.k8s.io/cluster: {{.cluster_domain_name}}
   name: control-plane-{{.aws_avalibility_region}}
 spec:
   image: {{.control_plane_image}}
@@ -107,7 +114,7 @@ kind: InstanceGroup
 metadata:
   creationTimestamp: null
   labels:
-    kops.k8s.io/cluster: {{.domain_name}}
+    kops.k8s.io/cluster: {{.cluster_domain_name}}
   name: cpu-nodes-{{.aws_avalibility_region}}
 spec:
   image: {{.cpu_node_image}}
@@ -136,7 +143,7 @@ kind: InstanceGroup
 metadata:
   creationTimestamp: null
   labels:
-    kops.k8s.io/cluster: {{.domain_name}}
+    kops.k8s.io/cluster: {{.cluster_domain_name}}
   name: gpu-nodes-{{.aws_avalibility_region}}
 spec:
   image: {{.gpu_node_image}}

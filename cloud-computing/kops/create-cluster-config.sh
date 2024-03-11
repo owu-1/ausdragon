@@ -1,6 +1,6 @@
 #!/bin/bash
 kops create cluster \
-    --name="$domain_name" \
+    --name="$cluster_domain_name" \
     --cloud=aws \
     --zones="$aws_avalibility_region" \
     --discovery-store="s3://$oidc_store_bucket/$domain_name/discovery" \
