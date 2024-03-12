@@ -1,0 +1,14 @@
+issuer: insert-oidc-issuer-url
+clientID: insert-client-id
+clientSecret: insert-client-secret
+## replace with your deploykf domain
+## NOTE: this must be an allowed redirect URI in the AWS Cognito app
+redirectURI: insert-redirect-uri
+## openid scopes to request
+scopes:
+  - openid
+  - email
+  - profile
+## cognito does not always send the `email_verified` claim
+insecureSkipEmailVerified: true
+userNameKey: cognito:username # https://github.com/argoproj/argo-cd/discussions/12185#discussioncomment-4799460

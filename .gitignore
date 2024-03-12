@@ -12,6 +12,8 @@ cloud-computing/deploykf/app-of-apps.yaml
 cloud-computing/deploykf/nginx-ingress.yaml
 cloud-computing/deploykf/nginx-ingress-controller.yaml
 cloud-computing/deploykf/values.yaml
+cloud-computing/deploykf/aws-cognito-config.yaml
+cloud-computing/deploykf/aws-cognito-secret.yaml
 
 scripts/__pycache__
 scripts/accelerated_computing_instance_spot_data

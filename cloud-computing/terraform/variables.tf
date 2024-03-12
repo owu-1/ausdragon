@@ -49,10 +49,10 @@ variable "admin_email" {
   description = "The email of the admin in the user pool"
 }
 
-# variable "cognito_domain_name" {
-#   type = string
-#   description = "The domain name of the cognito hosted ui"
-# }
+variable "cognito_domain_name" {
+  type = string
+  description = "The domain name of the cognito hosted ui"
+}
 
 variable "cloudflare_account_id" {
   type = string
@@ -62,4 +62,14 @@ variable "cloudflare_account_id" {
 variable "admin_email_routing_destination" {
   type = string
   description = "The email address where admin emails are routed to"
+}
+
+variable "deploykf_domain_name" {
+  type = string
+  description = "The domain name for deploykf"
+}
+
+variable "deploykf_https_port" {
+  type = string
+  description = "The https port for deploykf"
 }

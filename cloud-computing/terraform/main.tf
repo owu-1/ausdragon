@@ -26,10 +26,10 @@ provider "aws" {
 }
 
 # Needed for cognito hosted ui certificate
-# provider "aws" {
-#   alias = "us-east-1"
-#   region = "us-east-1"
-# }
+provider "aws" {
+  alias = "us-east-1"
+  region = "us-east-1"
+}
 
 provider "cloudflare" {
 

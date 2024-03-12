@@ -63,7 +63,15 @@ deploykf_core:
   ##             deploykf-auth
   ## --------------------------------------
   deploykf_auth:
-    {} # <-- REMOVE THIS, IF YOU INCLUDE VALUES UNDER THIS SECTION!
+    dex:
+      connectors:
+        - type: oidc
+          id: aws-cognito
+          name: AWS Cognito
+          configExistingSecret: aws-cognito-config
+          configExistingSecretKey: aws-cognito-config
+      staticPasswords:
+        {} # do not allow static passwords
 
   ## --------------------------------------
   ##        deploykf-istio-gateway
@@ -94,14 +102,11 @@ deploykf_core:
             existingSecretSecretKeyKey: AWS_SECRET_ACCESS_KEY
     users:
       - id: user-1
-        email: "user1@example.com"
-      - id: user-2
-        email: "user2@example.com"
+        email: insert-email-here
     groups:
       - id: team-1
         users:
           - user-1
-          - user-2
     profiles:
       - name: team-1
         members:

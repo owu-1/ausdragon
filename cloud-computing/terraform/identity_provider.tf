@@ -123,72 +123,72 @@ resource "aws_cognito_user_in_group" "admin" {
   username     = aws_cognito_user.admin.username
 }
 
-# resource "aws_acm_certificate" "cognito_hosted_ui" {
-#   provider = aws.us-east-1
-#   domain_name = var.cognito_domain_name
-#   validation_method = "DNS"
-#   key_algorithm = "EC_prime256v1" # note EC_secp384r1 cannot be used by cloudfront
-# }
+resource "aws_acm_certificate" "cognito_hosted_ui" {
+  provider = aws.us-east-1
+  domain_name = var.cognito_domain_name
+  validation_method = "DNS"
+  key_algorithm = "EC_prime256v1" # note EC_secp384r1 cannot be used by cloudfront
+}
 
 # Apply certificate validation
-# resource "cloudflare_record" "cognito_hosted_ui_validation" {
-#   for_each = {
-#     for dvo in aws_acm_certificate.cognito_hosted_ui.domain_validation_options : dvo.domain_name => {
-#       name   = dvo.resource_record_name
-#       record = dvo.resource_record_value
-#       type   = dvo.resource_record_type
-#     }
-#   }
+resource "cloudflare_record" "cognito_hosted_ui_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.cognito_hosted_ui.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
 
-#   zone_id         = cloudflare_zone.base_domain.id
-#   name            = each.value.name
-#   type            = each.value.type
-#   value           = each.value.record
-#   ttl             = 60
-# }
+  zone_id         = cloudflare_zone.base_domain.id
+  name            = each.value.name
+  type            = each.value.type
+  value           = each.value.record
+  ttl             = 60
+}
 
 # Wait for validation to complete
-# resource "aws_acm_certificate_validation" "cognito_hosted_ui" {
-#   provider = aws.us-east-1
-#   certificate_arn         = aws_acm_certificate.cognito_hosted_ui.arn
-#   validation_record_fqdns = [for record in cloudflare_record.cognito_hosted_ui_validation : record.hostname]
-# }
+resource "aws_acm_certificate_validation" "cognito_hosted_ui" {
+  provider = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.cognito_hosted_ui.arn
+  validation_record_fqdns = [for record in cloudflare_record.cognito_hosted_ui_validation : record.hostname]
+}
 
 # A record on root domain is required for user pool domain
-# resource "cloudflare_record" "root" {
-#   name    = var.base_domain_name
-#   type    = "A"
-#   zone_id = cloudflare_zone.base_domain.id
-#   value = "1.1.1.1" # arbitrary ip
-# }
+resource "cloudflare_record" "root" {
+  name    = var.base_domain_name
+  type    = "A"
+  zone_id = cloudflare_zone.base_domain.id
+  value = "1.1.1.1" # arbitrary ip
+}
 
 # Needed for getting id token forgot password
-# resource "aws_cognito_user_pool_domain" "cognito_hosted_ui" {
-#   provider = aws.identity_provider
-#   domain       = var.cognito_domain_name
-#   user_pool_id = aws_cognito_user_pool.kubernetes.id
-#   certificate_arn = aws_acm_certificate.cognito_hosted_ui.arn
-#   depends_on = [cloudflare_record.root, aws_acm_certificate_validation.cognito_hosted_ui]
-# }
+resource "aws_cognito_user_pool_domain" "cognito_hosted_ui" {
+  provider = aws.identity_provider
+  domain       = var.cognito_domain_name
+  user_pool_id = aws_cognito_user_pool.kubernetes.id
+  certificate_arn = aws_acm_certificate.cognito_hosted_ui.arn
+  depends_on = [cloudflare_record.root, aws_acm_certificate_validation.cognito_hosted_ui]
+}
 
-# resource "cloudflare_record" "cognito_hosted_ui" {
-#   name    = aws_cognito_user_pool_domain.cognito_hosted_ui.domain
-#   type    = "CNAME"
-#   zone_id = cloudflare_zone.base_domain.id
-#   value = aws_cognito_user_pool_domain.cognito_hosted_ui.cloudfront_distribution
-# }
+resource "cloudflare_record" "cognito_hosted_ui" {
+  name    = aws_cognito_user_pool_domain.cognito_hosted_ui.domain
+  type    = "CNAME"
+  zone_id = cloudflare_zone.base_domain.id
+  value = aws_cognito_user_pool_domain.cognito_hosted_ui.cloudfront_distribution
+}
 
 resource "aws_cognito_user_pool_client" "client" {
   provider = aws.identity_provider
   name = "client"
   user_pool_id = aws_cognito_user_pool.kubernetes.id
-  explicit_auth_flows = ["ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH"]  # todo: change to ALLOW_USER_SRP_AUTH
-  callback_urls = ["https://localhost:8000"]
-  logout_urls = ["https://localhost:8000"]
+  explicit_auth_flows = ["ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH"]
+  callback_urls = ["https://${var.deploykf_domain_name}:${deploykf_https_port}/dex/callback"]
+  logout_urls = ["https://${var.deploykf_domain_name}:${deploykf_https_port}/dex/callback"]
   supported_identity_providers = ["COGNITO"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows = ["code"]
-  allowed_oauth_scopes = ["openid"]
+  allowed_oauth_scopes = ["openid", "email", "profile"]
   prevent_user_existence_errors = "ENABLED"
   generate_secret = true
 

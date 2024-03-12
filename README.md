@@ -61,6 +61,8 @@ Edit security group ```nodes.$cluster_domain_name``` to include the deploy https
 
 After app-of-apps is synced, create Kubernetes secret for Kubeflow Pipelines for bucket access by running ```kubectl create secret generic bucket-creds-backend -n kubeflow --from-literal=AWS_ACCESS_KEY_ID=insert-aws-access-key-id --from-literal=AWS_SECRET_ACCESS_KEY=insert-secret-access-key```
 
+To add the AWS Cognito OIDC configuration run ```cloud-computing/deploykf/apply-aws-cognito-config.sh```.
+
 Follow instructions from [here](https://www.deploykf.org/guides/getting-started/#sync-argocd-applications) under ```Sync Applications - ArgoCD Web UI```.
 
 Example cloud-computing/variables.sh file
