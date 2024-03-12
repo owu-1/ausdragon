@@ -183,8 +183,8 @@ resource "aws_cognito_user_pool_client" "client" {
   name = "client"
   user_pool_id = aws_cognito_user_pool.kubernetes.id
   explicit_auth_flows = ["ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH"]
-  callback_urls = ["https://${var.deploykf_domain_name}:${deploykf_https_port}/dex/callback"]
-  logout_urls = ["https://${var.deploykf_domain_name}:${deploykf_https_port}/dex/callback"]
+  callback_urls = ["http://localhost:8000", "https://${var.deploykf_domain_name}:${var.deploykf_https_port}/dex/callback"]
+  logout_urls = ["http://localhost:8000", "https://${var.deploykf_domain_name}:${var.deploykf_https_port}/dex/callback"]
   supported_identity_providers = ["COGNITO"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows = ["code"]

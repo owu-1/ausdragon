@@ -1,6 +1,6 @@
 Attempt to make the cheapest Kubernetes cluster with GPU nodes on AWS. Kubernetes is self-managed and everything is running on spot EC2 instances. This project is experimental.
 
-The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/), [argocd](https://argo-cd.readthedocs.io/en/stable/cli_installation/) ([don't use 2.9.x](https://github.com/deployKF/deployKF/issues/70)), [yq](https://github.com/mikefarah/yq/?tab=readme-ov-file#install), [jq](https://jqlang.github.io/jq/download/).
+The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/), [argocd](https://argo-cd.readthedocs.io/en/stable/cli_installation/) ([don't use 2.9.x](https://github.com/deployKF/deployKF/issues/70)), [yq](https://github.com/mikefarah/yq/?tab=readme-ov-file#install), [jq](https://jqlang.github.io/jq/download/), [kubelogin](https://github.com/int128/kubelogin?tab=readme-ov-file#setup).
 
 Create a new file in ```cloud-computing/variables.sh``` based on ```cloud-computing/variables.example.sh```. You can ignore ```kops_aws_profile``` for now since the IAM user will be created with terraform first. You can also ignore ```cognito_user_pool_id``` ```cognito_client_id``` ```cognito_client_secret``` until the values are known after terraform is run.
 
@@ -24,7 +24,7 @@ Create the cluster configuration by running ```cloud-computing/kops/create-clust
 
 Deploy the cluster resources by running ```kops update cluster --name $cluster_domain_name --yes```
 
-Configure kubectl to use your OIDC ID and refresh token by running ```cloud-computing/kops/set-credentials.sh```
+Configure kubectl for OIDC by running ```kubectl oidc-login setup``` and following the instructions.
 
 Connect to the control plane instance via the SSH in the EC2 UI and run
 ```
