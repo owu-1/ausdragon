@@ -3,6 +3,7 @@
 # AWS options to create the infrastructure with
 terraform_aws_profile=root
 kops_aws_profile=kops
+# todo: name aws region variables better
 aws_region=ap-northeast-2
 aws_avalibility_region=ap-northeast-2a
 identity_provider_aws_region=ap-northeast-2

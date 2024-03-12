@@ -190,7 +190,7 @@ resource "aws_cognito_user_pool_client" "client" {
   allowed_oauth_flows = ["code"]
   allowed_oauth_scopes = ["openid"]
   prevent_user_existence_errors = "ENABLED"
-  # generate_secret = true
+  generate_secret = true
 
   auth_session_validity = 3
   refresh_token_validity = 30

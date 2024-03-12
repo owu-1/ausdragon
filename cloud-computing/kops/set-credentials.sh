@@ -35,18 +35,3 @@ kubectl config set-credentials "$admin_email" \
     --auth-provider-arg=refresh-token="$refresh_token"
 
 kubectl config set-context --current --user="$admin_email"
-
-# # todo: https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc restrict access more
-# kubectl apply -f - <<EOF
-# kind: ClusterRoleBinding
-# apiVersion: rbac.authorization.k8s.io/v1
-# metadata:
-#   name: oidc-cluster-admin
-# roleRef:
-#   apiGroup: rbac.authorization.k8s.io
-#   kind: ClusterRole
-#   name: cluster-admin
-# subjects:
-# - kind: Group
-#   name: oidc:admin
-# EOF

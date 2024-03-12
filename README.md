@@ -1,10 +1,8 @@
-These docs are outdated. This project is experimental.
+Attempt to make the cheapest Kubernetes cluster with GPU nodes on AWS. Kubernetes is self-managed and everything is running on spot EC2 instances. This project is experimental.
 
-Attempt to make the cheapest Kubernetes cluster with GPU nodes on AWS. Kubernetes is self-managed and everything is running on spot EC2 instances.
+The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/), [argocd](https://argo-cd.readthedocs.io/en/stable/cli_installation/) ([don't use 2.9.x](https://github.com/deployKF/deployKF/issues/70)), [yq](https://github.com/mikefarah/yq/?tab=readme-ov-file#install), [jq](https://jqlang.github.io/jq/download/).
 
-The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/), [argocd](https://argo-cd.readthedocs.io/en/stable/cli_installation/) ([don't use 2.9.x](https://github.com/deployKF/deployKF/issues/70)), [yq](https://github.com/mikefarah/yq/?tab=readme-ov-file#install).
-
-Create a new file in ```cloud-computing/variables.sh``` based on ```cloud-computing/variables.example.sh```. You can ignore ```kops_aws_profile``` for now since the IAM user will be created with terraform first.
+Create a new file in ```cloud-computing/variables.sh``` based on ```cloud-computing/variables.example.sh```. You can ignore ```kops_aws_profile``` for now since the IAM user will be created with terraform first. You can also ignore ```cognito_user_pool_id``` ```cognito_client_id``` ```cognito_client_secret``` until the values are known after terraform is run.
 
 Control plane nodes support AMD64/ARM64, 1 vCPU, 4 GiB memory (requests at CPU: 980m, memory: 676Mi). CPU nodes only support AMD64 because of [deployKF (read "CPU Architecture" note)](https://www.deploykf.org/guides/getting-started/#kubernetes-configurations). CPU nodes support 4 vCPU and 8 GiB memory (requests at CPU: 3530m, memory: 6088Mi).
 
@@ -16,13 +14,36 @@ Initialise terraform by running ```cloud-computing/terraform/init.sh```.
 
 Terraform will setup the necessary resources for kops. To provision the resources run ```terraform apply```.
 
-Create an access key for the kops IAM user. Setup a AWS CLI profile for it and enter the profile into ```cloud-computing/variables.sh as kops_aws_profile```.
+Create an access key for the kops IAM user. Setup a AWS CLI profile for it and enter the profile into ```cloud-computing/variables.sh``` as ```kops_aws_profile```.
+
+Find the values for ```cognito_user_pool_id``` ```cognito_client_id``` ```cognito_client_secret``` and apply them to ```cloud-computing/variables.sh```.
 
 Enter the kops environment by running ```source cloud-computing/kops/env.sh```.
 
 Create the cluster configuration by running ```cloud-computing/kops/create-cluster.sh```.
 
-Deploy the cluster resources by running ```kops update cluster --name $domain_name --yes --admin```
+Deploy the cluster resources by running ```kops update cluster --name $cluster_domain_name --yes```
+
+Configure kubectl to use your OIDC ID and refresh token by running ```cloud-computing/kops/set-credentials.sh```
+
+Connect to the control plane instance via the SSH in the EC2 UI and run
+```
+# todo: restrict access more https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc
+
+kubectl apply -f - <<EOF
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: oidc-cluster-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: Group
+  name: oidc:admin
+EOF
+```
 
 Install ArgoCD and the deployKF plugin by [following these instructions](https://github.com/deployKF/deployKF/tree/main/argocd-plugin#install-plugin---new-argocd) in section ```Install Plugin - New ArgoCD```
 
@@ -36,7 +57,7 @@ Get ArgoCD initial password by running ```argocd admin initial-password -n argoc
 
 Port forward ArgoCD ```kubectl port-forward svc/argocd-server -n argocd 8080:443```
 
-Edit security group ```nodes.$domain_name``` to include the deploy https port as inbound rule.
+Edit security group ```nodes.$cluster_domain_name``` to include the deploy https port as inbound rule.
 
 Create Kubernetes secret for Kubeflow Pipelines for bucket access by running ```kubectl create secret generic bucket-creds-backend -n kubeflow --from-literal=AWS_ACCESS_KEY_ID=insert-aws-access-key-id --from-literal=AWS_SECRET_ACCESS_KEY=insert-secret-access-key```
 
@@ -50,6 +71,7 @@ Example cloud-computing/variables.sh file
 # AWS options to create the infrastructure with
 terraform_aws_profile=root
 kops_aws_profile=kops
+# todo: name aws region variables better
 aws_region=ap-northeast-2
 aws_avalibility_region=ap-northeast-2a
 identity_provider_aws_region=ap-northeast-2
@@ -114,6 +136,12 @@ gpu_node_volume_size=20
 # Include | All zones from an account | account-name
 cloudflare_account_id='abcdef123'
 cloudflare_api_token='abcdef123'
+
+# Cognito
+# todo: automatically fill this in after terraform apply
+cognito_user_pool_id=ap-northeast-2_abcdef123
+cognito_client_id=abcdef123
+cognito_client_secret=abcdef123
 ```
 
 You can edit ```cloud-computing/kops/cluster.tmpl.yml``` to adjust scaling min/max and change instances to on-demand for more stability. Also if you want T instances to run in standard mode, uncomment ```cpuCredits: standard``` for your instance group.
