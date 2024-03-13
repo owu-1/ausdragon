@@ -147,7 +147,7 @@ kubeflow_tools:
   ##               notebooks
   ## --------------------------------------
   notebooks:
-    enabled: false
+    enabled: true
 
   ## --------------------------------------
   ##               pipelines

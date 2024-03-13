@@ -74,3 +74,4 @@ cloudflare_api_token=abcdef123
 cognito_user_pool_id=ap-northeast-2_abcdef123
 cognito_client_id=abcdef123
 cognito_client_secret=abcdef123
+cognito_domain_name="cognito.$base_domain_name"

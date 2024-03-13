@@ -1,6 +1,6 @@
 Attempt to make the cheapest Kubernetes cluster with GPU nodes on AWS. Kubernetes is self-managed and everything is running on spot EC2 instances. This project is experimental.
 
-The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/), [argocd](https://argo-cd.readthedocs.io/en/stable/cli_installation/) ([don't use 2.9.x](https://github.com/deployKF/deployKF/issues/70)), [yq](https://github.com/mikefarah/yq/?tab=readme-ov-file#install), [jq](https://jqlang.github.io/jq/download/), [kubelogin](https://github.com/int128/kubelogin?tab=readme-ov-file#setup).
+The instructions below assume you have AWS CLI with a profile setup ([AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions)) ([SSO profile](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html)) ([IAM profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-authentication-user.html#cli-authentication-user-configure.title)), [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform), [kOps](https://kops.sigs.k8s.io/getting_started/install/), [argocd](https://argo-cd.readthedocs.io/en/stable/cli_installation/) ([don't use 2.9.x](https://github.com/deployKF/deployKF/issues/70)) todo: remove, [yq](https://github.com/mikefarah/yq/?tab=readme-ov-file#install), [jq](https://jqlang.github.io/jq/download/), [kubelogin](https://github.com/int128/kubelogin?tab=readme-ov-file#setup).
 
 Create a new file in ```cloud-computing/variables.sh``` based on ```cloud-computing/variables.example.sh```. You can ignore ```kops_aws_profile``` for now since the IAM user will be created with terraform first. You can also ignore ```cognito_user_pool_id``` ```cognito_client_id``` ```cognito_client_secret``` until the values are known after terraform is run.
 
@@ -24,7 +24,7 @@ Create the cluster configuration by running ```cloud-computing/kops/create-clust
 
 Deploy the cluster resources by running ```kops update cluster --name $cluster_domain_name --yes```
 
-Configure kubectl for OIDC by running ```kubectl oidc-login setup``` and following the instructions.
+Configure kubectl for OIDC by running ```cloud-computing/kops/set-credentials.sh``` and by following the instructions it outputs.
 
 Connect to the control plane instance via the SSH in the EC2 UI and run
 ```
@@ -53,7 +53,8 @@ Deploy the nginx ingress controller by running ```cloud-computing/deploykf/deplo
 
 You can use a script provided by deployKF to automatically sync the ArgoCD applications, however the script keeps getting stuck. Also it waits 60 seconds for user input multiple times to ask whether you want to sync with pruning. Instead, the web ui can be used to sync manually.
 
-Get ArgoCD initial password by running ```argocd admin initial-password -n argocd```
+Get ArgoCD initial password by running ```kubectl -n argocd get secret/argocd-initial-admin-secret \
+  -o jsonpath="{.data.password}" | base64 -d```
 
 Port forward ArgoCD ```kubectl port-forward svc/argocd-server -n argocd 8080:443```
 
@@ -79,7 +80,7 @@ aws_avalibility_region=ap-northeast-2a
 identity_provider_aws_region=ap-northeast-2
 
 # Domain names
-base_domain_name="example.com"
+base_domain_name=example.com
 cluster_domain_name="kubernetes.$base_domain_name"
 
 # Subdomain used for deployKF
@@ -87,7 +88,7 @@ deploykf_domain_name="deploykf.$cluster_domain_name"
 
 # Admin email
 admin_email="admin@$base_domain_name"
-admin_email_routing_destination="user@example.net"
+admin_email_routing_destination=user@example.net
 
 # S3 bucket for terraform state
 terraform_state_bucket=terraform-state-abc123
@@ -136,14 +137,15 @@ gpu_node_volume_size=20
 # Include | All accounts
 # Zone Resources
 # Include | All zones from an account | account-name
-cloudflare_account_id='abcdef123'
-cloudflare_api_token='abcdef123'
+cloudflare_account_id=abcdef123
+cloudflare_api_token=abcdef123
 
 # Cognito
 # todo: automatically fill this in after terraform apply
 cognito_user_pool_id=ap-northeast-2_abcdef123
 cognito_client_id=abcdef123
 cognito_client_secret=abcdef123
+cognito_domain_name="cognito.$base_domain_name"
 ```
 
 You can edit ```cloud-computing/kops/cluster.tmpl.yml``` to adjust scaling min/max and change instances to on-demand for more stability. Also if you want T instances to run in standard mode, uncomment ```cpuCredits: standard``` for your instance group.
